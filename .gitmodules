@@ -3,7 +3,7 @@
 	url = https://github.com/matej/facebook-ios-sdk.git
 [submodule "Submodules/JSONKit"]
 	path = Submodules/JSONKit
-	url = https://github.com/johnezang/JSONKit.git
+	url = https://github.com/groue/JSONKit.git
 [submodule "Submodules/sskeychain"]
 	path = Submodules/sskeychain
 	url = https://github.com/samsoffes/sskeychain.git
