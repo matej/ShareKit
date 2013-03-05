@@ -80,13 +80,17 @@
 - (NSNumber*)readabilityUseXAuth;
 - (NSString*)foursquareV2ClientId;
 - (NSString*)foursquareV2RedirectURI;
+- (NSString*)tumblrConsumerKey;
+- (NSString*)tumblrSecret;
+- (NSString*)tumblrCallbackUrl;
 - (NSNumber*)shareMenuAlphabeticalOrder;
 - (NSString*)barStyle;
 - (UIColor*)barTintForView:(UIViewController*)vc;
 - (UIColor*)formFontColor;
 - (UIColor*)formBackgroundColor;
 - (NSString*)modalPresentationStyleForController:(UIViewController *)controller;
-- (NSString*)modalTransitionStyle;
+- (NSString*)modalTransitionStyleForController:(UIViewController *)controller;
+- (NSNumber *)isUsingCocoaPods;
 - (NSNumber*)maxFavCount;
 - (NSNumber*)autoOrderFavoriteSharers;
 - (NSString*)favsPrefixKey;

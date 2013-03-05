@@ -231,6 +231,7 @@
 - (NSNumber*)readabilityUseXAuth {
 	return [NSNumber numberWithInt:1];
 }
+
 // Foursquare V2 - https://developer.foursquare.com
 - (NSString*)foursquareV2ClientId {
     return @"";
@@ -238,6 +239,20 @@
 
 - (NSString*)foursquareV2RedirectURI {
     return @"";
+}
+
+// Tumblr - http://www.tumblr.com/docs/en/api/v2
+- (NSString*)tumblrConsumerKey {
+	return @"";
+}
+
+- (NSString*)tumblrSecret {
+	return @"";
+}
+
+//you can put whatever here. It must be the same you entered in tumblr app registration, eg tumblr.sharekit.com
+- (NSString*)tumblrCallbackUrl {
+	return @"";
 }
 
 /*
@@ -269,7 +284,7 @@
 	return @"UIModalPresentationFormSheet";// See: http://developer.apple.com/iphone/library/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalPresentationStyle
 }
 
-- (NSString*)modalTransitionStyle {
+- (NSString*)modalTransitionStyleForController:(UIViewController *)controller {
 	return @"UIModalTransitionStyleCoverVertical";// See: http://developer.apple.com/iphone/library/documentation/UIKit/Reference/UIViewController_Class/Reference/Reference.html#//apple_ref/occ/instp/UIViewController/modalTransitionStyle
 }
 // ShareMenu Ordering
@@ -342,6 +357,13 @@
  ----------------------
  These settings can be left as is.  This only need to be changed for uber custom installs.
  */
+
+
+/* cocoaPods can not build ShareKit.bundle resource target. This switches ShareKit to use resources directly. If someone knows how to build a resource target with cocoapods, please submit a pull request, so we can get rid of languages ShareKit.bundle and put languages directly to resource target */
+- (NSNumber *)isUsingCocoaPods {
+    return [NSNumber numberWithBool:NO];
+}
+
 - (NSNumber*)maxFavCount {
 	return [NSNumber numberWithInt:3];
 }

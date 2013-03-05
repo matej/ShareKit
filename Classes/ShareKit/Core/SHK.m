@@ -38,8 +38,15 @@
 #import <MessageUI/MessageUI.h>
 #include <sys/xattr.h>
 
-NSString * SHKLocalizedStringFormat(NSString* key);
+NSString * const SHKSendDidStartNotification = @"SHKSendDidStartNotification";
+NSString * const SHKSendDidFinishNotification = @"SHKSendDidFinish";
+NSString * const SHKSendDidFailWithErrorNotification = @"SHKSendDidFailWithError";
+NSString * const SHKSendDidCancelNotification = @"SHKSendDidCancel";
+NSString * const SHKAuthDidFinishNotification = @"SHKAuthDidFinish";
+
 NSString * const SHKHideCurrentViewFinishedNotification = @"SHKHideCurrentViewFinished";
+
+NSString * SHKLocalizedStringFormat(NSString* key);
 
 @interface SHK ()
 
@@ -190,7 +197,7 @@ BOOL SHKinit;
         vc.modalPresentationStyle = [SHK modalPresentationStyleForController:vc];
     
     if ([vc respondsToSelector:@selector(modalTransitionStyle)] && !isSocialOrTwitterComposeVc)
-        vc.modalTransitionStyle = [SHK modalTransitionStyle];
+        vc.modalTransitionStyle = [SHK modalTransitionStyleForController:vc];
     
     UIViewController *topViewController = [self rootViewForUIDisplay];
     
@@ -306,15 +313,17 @@ BOOL SHKinit;
 	return UIModalPresentationCurrentContext;
 }
 
-+ (UIModalTransitionStyle)modalTransitionStyle
++ (UIModalTransitionStyle)modalTransitionStyleForController:(UIViewController *)controller
 {
-	if ([SHKCONFIG(modalTransitionStyle) isEqualToString:@"UIModalTransitionStyleFlipHorizontal"])
+    NSString *transitionString = SHKCONFIG_WITH_ARGUMENT(modalTransitionStyleForController:, controller);
+    
+	if ([transitionString isEqualToString:@"UIModalTransitionStyleFlipHorizontal"])
 		return UIModalTransitionStyleFlipHorizontal;
 	
-	else if ([SHKCONFIG(modalTransitionStyle) isEqualToString:@"UIModalTransitionStyleCrossDissolve"])
+	else if ([transitionString isEqualToString:@"UIModalTransitionStyleCrossDissolve"])
 		return UIModalTransitionStyleCrossDissolve;
 	
-	else if ([SHKCONFIG(modalTransitionStyle) isEqualToString:@"UIModalTransitionStylePartialCurl"])
+	else if ([transitionString isEqualToString:@"UIModalTransitionStylePartialCurl"])
 		return UIModalTransitionStylePartialCurl;
 	
 	return UIModalTransitionStyleCoverVertical;
@@ -653,12 +662,18 @@ static NSDictionary *sharersDictionary = nil;
 
 + (NSError *)error:(NSString *)description, ...
 {
-	va_list args;
-    va_start(args, description);
-    NSString *string = [[[NSString alloc] initWithFormat:description arguments:args] autorelease];
-    va_end(args);
-	
-	return [NSError errorWithDomain:@"sharekit" code:1 userInfo:[NSDictionary dictionaryWithObject:string forKey:NSLocalizedDescriptionKey]];
+	NSDictionary *userInfo = nil;
+
+	if (description) {
+		va_list args;
+		va_start(args, description);
+		NSString *string = [[[NSString alloc] initWithFormat:description arguments:args] autorelease];
+		va_end(args);
+
+		userInfo = [NSDictionary dictionaryWithObject:string forKey:NSLocalizedDescriptionKey];
+	}
+
+	return [NSError errorWithDomain:@"sharekit" code:1 userInfo:userInfo];
 }
 
 #pragma mark -
@@ -784,10 +799,16 @@ NSString* SHKLocalizedStringFormat(NSString* key)
 {
   static NSBundle* bundle = nil;
   if (nil == bundle) {
-    NSString* path = [[SHK shareKitLibraryBundlePath] stringByAppendingPathComponent:@"ShareKit.bundle"];
-    bundle = [[NSBundle bundleWithPath:path] retain];
-    
-    NSCAssert(bundle != nil,@"ShareKit has been refactored to be used as Xcode subproject. Please follow the updated installation wiki and re-add it to the project. Please do not forget to clean project and clean build folder afterwards");
+      
+      NSString *path = nil;
+      if ([SHKCONFIG(isUsingCocoaPods) boolValue]) {
+          path = [SHK shareKitLibraryBundlePath];
+      } else {
+          path = [[SHK shareKitLibraryBundlePath] stringByAppendingPathComponent:@"ShareKit.bundle"];
+      }
+      
+      bundle = [[NSBundle bundleWithPath:path] retain];
+      NSCAssert(bundle != nil,@"ShareKit has been refactored to be used as Xcode subproject. Please follow the updated installation wiki and re-add it to the project. Please do not forget to clean project and clean build folder afterwards. In case you use CocoaPods override - (NSNumber *)isUsingCocoaPods; method in your configurator subclass and return [NSNumber numberWithBool:YES]");
   }
   return [bundle localizedStringForKey:key value:key table:nil];
 }
